@@ -1,6 +1,6 @@
 #!/bin/bash
 #COBALT -A HEP_on_HPC
-#COBALT -n 3
+#COBALT -n 5
 #COBALT -t 0:30:00
 #COBALT --mode script
 #COBALT -q debug-cache-quad
@@ -34,16 +34,29 @@ time aprun -n ${AMS_NUM_SERVERS} -N 15 -cc none -p ${PDOMAIN} example-server -a 
 
 sleep 30
 
+cd ./amr_wind_inputs_1/1
+
 echo "Starting AMR-WIND.."
 module unload darshan
-export AMS_WORKING_DIR=/home/sramesh/VIZ_SERVICE/experiments/amr_wind_inputs_1
+export AMS_WORKING_DIR=/home/sramesh/VIZ_SERVICE/experiments/amr_wind_inputs_1/1
 export AMS_TASK_ID=1
 export AMS_SERVER_INSTANCE_ID=0
-export AMS_MAX_TASK_ID=0
+export AMS_MAX_TASK_ID=2
 export AMS_MAX_STEP=50
 export MPICH_GNI_NDREG_ENTRIES=1024
 export MARGO_ENABLE_PROFILING=0
-cd ${AMS_WORKING_DIR}
+time aprun -n 120 -N 60 -p ${PDOMAIN} -cc none -d 1 amr_wind medium.damBreak.i &
+
+cd ../2
+echo "Starting AMR-WIND.."
+module unload darshan
+export AMS_WORKING_DIR=/home/sramesh/VIZ_SERVICE/experiments/amr_wind_inputs_1/2
+export AMS_TASK_ID=2
+export AMS_SERVER_INSTANCE_ID=0
+export AMS_MAX_TASK_ID=2
+export AMS_MAX_STEP=50
+export MPICH_GNI_NDREG_ENTRIES=1024
+export MARGO_ENABLE_PROFILING=0
 time aprun -n 120 -N 60 -p ${PDOMAIN} -cc none -d 1 amr_wind medium.damBreak.i
 
 echo "Destroying protection domain"
