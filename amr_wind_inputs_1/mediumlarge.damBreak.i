@@ -2,7 +2,7 @@
 #            SIMULATION STOP            #
 #.......................................#
 time.stop_time               =   10     # Max (simulated) time to evolve
-time.max_step                =   100     # Max number of time steps
+time.max_step                =   50     # Max number of time steps
 time.init_shrink = 0.001
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -43,7 +43,7 @@ ICNS.source_terms = GravityForcing
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 # ADAPTIVE MESH REFINEMENT #
 #.......................................#
-amr.n_cell              = 240 64 96    # Grid cells at coarsest AMRlevel
+amr.n_cell              = 320 64 48    # Grid cells at coarsest AMRlevel
 amr.max_level           = 1           # Max AMR level in hierarchy
 amr.max_grid_size      = 64
 amr.blocking_factor     = 8

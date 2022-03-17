@@ -1,0 +1,25 @@
+- 
+    action: "add_pipelines"
+    pipelines: 
+        pl1: 
+            f1: 
+                type: "contour" 
+                params: 
+                    field: "velocityx"
+                    iso_values: 8.0
+- 
+    action: "add_scenes"
+    scenes: 
+        s1: 
+            renders:
+                r1:
+                    type: "cinema"
+                    phi: 2
+                    theta: 2
+                    db_name: "contour_cinema"
+            plots: 
+                p1: 
+                    type: "pseudocolor"
+                    field: "velocityx"
+                    pipeline: "pl1"
+            image_prefix: "amr_contour_cinema"
