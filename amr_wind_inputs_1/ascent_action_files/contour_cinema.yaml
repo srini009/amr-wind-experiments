@@ -6,7 +6,7 @@
                 type: "contour" 
                 params: 
                     field: "velocityx"
-                    iso_values: 8.0
+                    iso_values: 500.0
 - 
     action: "add_scenes"
     scenes: 
@@ -14,8 +14,8 @@
             renders:
                 r1:
                     type: "cinema"
-                    phi: 2
-                    theta: 2
+                    phi: 20
+                    theta: 20
                     db_name: "contour_cinema"
             plots: 
                 p1: 

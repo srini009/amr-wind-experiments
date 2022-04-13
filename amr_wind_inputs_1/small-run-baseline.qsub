@@ -1,6 +1,6 @@
 #!/bin/bash
 #COBALT -A HEP_on_HPC
-#COBALT -n 2
+#COBALT -n 6
 #COBALT -t 0:30:00
 #COBALT --mode script
 #COBALT -q debug-cache-quad
@@ -40,10 +40,11 @@ module unload darshan
 export AMS_WORKING_DIR=/home/sramesh/VIZ_SERVICE/experiments/amr_wind_inputs_1
 export AMS_SERVER_MODE=1
 export AMS_TASK_ID=1
+export AMS_VIZ_FREQUENCY=8
 export AMS_SERVER_INSTANCE_ID=0
 export AMS_MAX_TASK_ID=1
 export AMS_MAX_STEP=50
 export MPICH_GNI_NDREG_ENTRIES=1024
 export MARGO_ENABLE_PROFILING=0
 cd amr_wind_inputs_1/1
-time aprun -n 120 -N 60 -p ${PDOMAIN} -cc none -d 1 amr_wind ../medium120.damBreak.i
+time aprun -n 360 -N 60 -p ${PDOMAIN} -cc none -d 1 amr_wind ../mediumlarge360.damBreak.i

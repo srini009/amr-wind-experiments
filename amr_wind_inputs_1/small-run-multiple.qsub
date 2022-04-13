@@ -1,6 +1,6 @@
 #!/bin/bash
 #COBALT -A HEP_on_HPC
-#COBALT -n 5
+#COBALT -n 7
 #COBALT -t 0:30:00
 #COBALT --mode script
 #COBALT -q debug-cache-quad
@@ -20,6 +20,7 @@ sleep 5
 export AMS_NUM_SERVERS=15
 export AMS_NUM_SERVERS_PER_INSTANCE=15
 export AMS_NUM_SERVER_INSTANCES=1
+export AMS_SERVER_MODE=1
 export AMS_SERVER_ADDR_FILE=/home/sramesh/VIZ_SERVICE/experiments/addr.mercury
 export AMS_NODE_ADDR_FILE=/home/sramesh/VIZ_SERVICE/experiments/nodes.mercury
 export AMS_ACTIONS_FILE=/home/sramesh/VIZ_SERVICE/experiments/amr_wind_inputs_1/ascent_action_files/default.yaml
@@ -40,12 +41,13 @@ echo "Starting AMR-WIND.."
 module unload darshan
 export AMS_WORKING_DIR=/home/sramesh/VIZ_SERVICE/experiments/amr_wind_inputs_1/1
 export AMS_TASK_ID=1
+export AMS_SERVER_MODE=1
 export AMS_SERVER_INSTANCE_ID=0
-export AMS_MAX_TASK_ID=2
+export AMS_MAX_TASK_ID=3
 export AMS_MAX_STEP=50
 export MPICH_GNI_NDREG_ENTRIES=1024
 export MARGO_ENABLE_PROFILING=0
-time aprun -n 120 -N 60 -p ${PDOMAIN} -cc none -d 1 amr_wind medium.damBreak.i &
+time aprun -n 120 -N 60 -p ${PDOMAIN} -cc none -d 1 amr_wind ../medium.damBreak.i &
 
 cd ../2
 echo "Starting AMR-WIND.."
@@ -53,11 +55,25 @@ module unload darshan
 export AMS_WORKING_DIR=/home/sramesh/VIZ_SERVICE/experiments/amr_wind_inputs_1/2
 export AMS_TASK_ID=2
 export AMS_SERVER_INSTANCE_ID=0
-export AMS_MAX_TASK_ID=2
+export AMS_SERVER_MODE=1
+export AMS_MAX_TASK_ID=3
 export AMS_MAX_STEP=50
 export MPICH_GNI_NDREG_ENTRIES=1024
 export MARGO_ENABLE_PROFILING=0
-time aprun -n 120 -N 60 -p ${PDOMAIN} -cc none -d 1 amr_wind medium.damBreak.i
+time aprun -n 120 -N 60 -p ${PDOMAIN} -cc none -d 1 amr_wind ../medium.damBreak.i &
+
+cd ../3
+echo "Starting AMR-WIND.."
+module unload darshan
+export AMS_WORKING_DIR=/home/sramesh/VIZ_SERVICE/experiments/amr_wind_inputs_1/3
+export AMS_TASK_ID=3
+export AMS_SERVER_INSTANCE_ID=0
+export AMS_SERVER_MODE=1
+export AMS_MAX_TASK_ID=3
+export AMS_MAX_STEP=50
+export MPICH_GNI_NDREG_ENTRIES=1024
+export MARGO_ENABLE_PROFILING=0
+time aprun -n 120 -N 60 -p ${PDOMAIN} -cc none -d 1 amr_wind ../medium.damBreak.i
 
 echo "Destroying protection domain"
 apmgr pdomain -r -u ${PDOMAIN}
