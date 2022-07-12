@@ -1,6 +1,6 @@
 #!/bin/bash
 #COBALT -A XXX
-#COBALT -n 209
+#COBALT -n 226
 #COBALT -t 0:35:00
 #COBALT --mode script
 #COBALT -q default
@@ -108,7 +108,7 @@ time aprun -n ${AMS_NUM_SERVERS} -N 60 -cc none -p ${PDOMAIN} example-server -a 
 
 sleep 30
 
-for i in {1..16}
+for i in {1..8}
 do 
 	echo "Starting AMR-WIND for C14: $i"
 	module unload darshan
@@ -116,7 +116,7 @@ do
 	cd $PROJECT_HOME/C14/$i
 	source ../sourceme.sh
 	export AMS_TASK_ID=$i
-	export AMS_MAX_TASK_ID=16
+	export AMS_MAX_TASK_ID=8
 	export AMS_SERVER_INSTANCE_ID=0
 	time aprun -n 120 -N 60 -p ${PDOMAIN} -cc none -d 1 amr_wind ../../medium120.damBreak.i >& STDOUT &
 done
@@ -133,7 +133,7 @@ time aprun -n ${AMS_NUM_SERVERS} -N 60 -cc none -p ${PDOMAIN} example-server -a 
 
 sleep 30
 
-for i in {1..32}
+for i in {1..16}
 do 
 	echo "Starting AMR-WIND for C15: $i"
 	module unload darshan
@@ -141,9 +141,34 @@ do
 	cd $PROJECT_HOME/C15/$i
 	source ../sourceme.sh
 	export AMS_TASK_ID=$i
-	export AMS_MAX_TASK_ID=32
+	export AMS_MAX_TASK_ID=16
 	export AMS_SERVER_INSTANCE_ID=0
 	time aprun -n 240 -N 60 -p ${PDOMAIN} -cc none -d 1 amr_wind ../../mediumlarge240.damBreak.i >& STDOUT &
+done
+###################################################################
+#C16 Experiments
+##################################################################
+cd $PROJECT_HOME
+cd C16/
+source ./sourceme.sh
+
+echo "Starting Ascent Server for C16"
+module unload darshan
+time aprun -n ${AMS_NUM_SERVERS} -N 60 -cc none -p ${PDOMAIN} example-server -a ofi+gni >& STDOUT &
+
+sleep 30
+
+for i in {1..16}
+do 
+	echo "Starting AMR-WIND for C16: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C16/$i
+	cd $PROJECT_HOME/C16/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=16
+	export AMS_SERVER_INSTANCE_ID=0
+	time aprun -n 360 -N 60 -p ${PDOMAIN} -cc none -d 1 amr_wind ../../mediumlarge360.damBreak.i >& STDOUT &
 done
 ##################################################################
 wait
