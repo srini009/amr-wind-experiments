@@ -1,0 +1,26 @@
+- 
+    action: "add_pipelines"
+    pipelines: 
+        pl1: 
+            f1:
+                type: "composite_vector"
+                params:
+                  field1: "velocityx"
+                  field2: "velocityy"
+                  field3: "velocityz"
+                  output_name: "vel_vec"
+            f2: 
+                type: "vector_magnitude"
+                params: 
+                    field: "vel_vec"
+                    output_name: "vel_vec_mag"
+- 
+    action: "add_scenes"
+    scenes: 
+        s1: 
+            plots: 
+                p1: 
+                    type: "pseudocolor"
+                    field: "vel_vec_mag"
+                    pipeline: "pl1"
+            image_prefix: "amr_slice_velvec"
