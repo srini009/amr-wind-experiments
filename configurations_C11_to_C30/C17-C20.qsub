@@ -1,0 +1,121 @@
+#!/bin/bash
+#COBALT -A XXX #CHANGEME
+#COBALT -n 128
+#COBALT -t 0:35:00
+#COBALT --mode script
+#COBALT -q default
+#COBALT --attrs filesystems=home,grand,theta-fs0
+
+set -eu
+
+PDOMAIN=XXX #CHANGEME
+
+PROJECT_HOME=`pwd`
+cd $PROJECT_HOME
+echo "Setting up spack and modules"
+source ./theta_sourceme.sh #CHANGEME
+
+
+echo "Setting up the protection domain"
+apstat -P | grep ${PDOMAIN} || apmgr pdomain -c -u ${PDOMAIN}
+sleep 5
+
+PROJECT_HOME=`pwd`
+#C17 Experiments
+##################################################################
+cd $PROJECT_HOME
+cd C17/
+source ./sourceme.sh
+
+echo "Starting Ascent Server for C17"
+module unload darshan
+time aprun -n ${AMS_NUM_SERVERS} -N 64 -cc none -p ${PDOMAIN} example-server -a ofi+gni >& STDOUT &
+
+sleep 30
+
+for i in {1..4}
+do 
+	echo "Starting Kripke for C17: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C17/$i
+	cd $PROJECT_HOME/C17/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=4
+	export AMS_SERVER_INSTANCE_ID=0
+	time aprun -n 256 -N 64 -p ${PDOMAIN} -cc none -d 1 kripke_par --procs 8,8,4 --zones 256,256,128 --niter 100 --dir 1:2 --grp 1:1 --legendre 4 --quad 4:4 >& STDOUT &
+done
+#C18 Experiments
+##################################################################
+cd $PROJECT_HOME
+cd C18/
+source ./sourceme.sh
+
+echo "Starting Ascent Server for C18"
+module unload darshan
+time aprun -n ${AMS_NUM_SERVERS} -N 64 -cc none -p ${PDOMAIN} example-server -a ofi+gni >& STDOUT &
+
+sleep 30
+
+for i in {1..4}
+do 
+	echo "Starting Kripke for C18: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C18/$i
+	cd $PROJECT_HOME/C18/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=4
+	export AMS_SERVER_INSTANCE_ID=0
+	time aprun -n 384 -N 64 -p ${PDOMAIN} -cc none -d 1 kripke_par --procs 8,8,6 --zones 256,256,128 --niter 100 --dir 1:2 --grp 1:1 --legendre 4 --quad 4:4 >& STDOUT &
+done
+#C19 Experiments
+##################################################################
+cd $PROJECT_HOME
+cd C19/
+source ./sourceme.sh
+
+echo "Starting Ascent Server for C19"
+module unload darshan
+time aprun -n ${AMS_NUM_SERVERS} -N 64 -cc none -p ${PDOMAIN} example-server -a ofi+gni >& STDOUT &
+
+sleep 30
+
+for i in {1..8}
+do 
+	echo "Starting Kripke for C19: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C19/$i
+	cd $PROJECT_HOME/C19/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=8
+	export AMS_SERVER_INSTANCE_ID=0
+	time aprun -n 256 -N 64 -p ${PDOMAIN} -cc none -d 1 kripke_par --procs 8,8,4 --zones 256,256,128 --niter 100 --dir 1:2 --grp 1:1 --legendre 4 --quad 4:4 >& STDOUT &
+done
+#C20 Experiments
+##################################################################
+cd $PROJECT_HOME
+cd C20/
+source ./sourceme.sh
+
+echo "Starting Ascent Server for C20"
+module unload darshan
+time aprun -n ${AMS_NUM_SERVERS} -N 64 -cc none -p ${PDOMAIN} example-server -a ofi+gni >& STDOUT &
+
+sleep 30
+
+for i in {1..8}
+do 
+	echo "Starting Kripke for C20: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C20/$i
+	cd $PROJECT_HOME/C20/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=8
+	export AMS_SERVER_INSTANCE_ID=0
+	time aprun -n 384 -N 64 -p ${PDOMAIN} -cc none -d 1 kripke_par --procs 8,8,6 --zones 256,256,128 --niter 100 --dir 1:2 --grp 1:1 --legendre 4 --quad 4:4 >& STDOUT &
+done
+##################################################################
+wait
