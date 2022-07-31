@@ -1,0 +1,73 @@
+#!/bin/bash
+#COBALT -A XXX #CHANGEME
+#COBALT -n 290
+#COBALT -t 0:35:00
+#COBALT --mode script
+#COBALT -q default
+#COBALT --attrs filesystems=home,grand,theta-fs0
+
+set -eu
+
+PDOMAIN=XXX #CHANGEME
+
+PROJECT_HOME=`pwd`
+cd $PROJECT_HOME
+echo "Setting up spack and modules"
+source $theta_sourceme.sh #CHANGEME
+
+echo "Setting up the protection domain"
+apstat -P | grep ${PDOMAIN} || apmgr pdomain -c -u ${PDOMAIN}
+sleep 5
+
+#C2 Experiments
+##################################################################
+cd $PROJECT_HOME
+cd C2/
+source ./sourceme.sh
+
+echo "Starting Ascent Server for C2"
+module unload darshan
+time aprun -n ${AMS_NUM_SERVERS} -N 60 -cc none -p ${PDOMAIN} example-server -a ofi+gni >& STDOUT &
+
+sleep 30
+
+for i in {1..8}
+do 
+	echo "Starting AMR-WIND for C2: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C2/$i
+	cd $PROJECT_HOME/C2/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=8
+	export AMS_SERVER_INSTANCE_ID=`expr $i % 2`
+	time aprun -n 240 -N 60 -p ${PDOMAIN} -cc none -d 1 amr_wind ../../mediumlarge240.damBreak.i >& STDOUT &
+done
+
+###################################################################
+#C6 Experiments
+##################################################################
+cd $PROJECT_HOME
+cd C6/
+source ./sourceme.sh
+
+echo "Starting Ascent Server for C6"
+module unload darshan
+time aprun -n ${AMS_NUM_SERVERS} -N 60 -cc none -p ${PDOMAIN} example-server -a ofi+gni >& STDOUT &
+
+sleep 30
+
+for i in {1..64}
+do 
+	echo "Starting AMR-WIND for C6: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C6/$i
+	cd $PROJECT_HOME/C6/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=64
+	export AMS_SERVER_INSTANCE_ID=`expr $i % 2`
+	time aprun -n 240 -N 60 -p ${PDOMAIN} -cc none -d 1 amr_wind ../../mediumlarge240.damBreak.i >& STDOUT &
+done
+###################################################################
+wait
