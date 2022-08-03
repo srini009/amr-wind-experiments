@@ -1,0 +1,274 @@
+#!/bin/bash
+#COBALT -A XXX #CHANGE ME
+#COBALT -n 128
+#COBALT -t 0:35:00
+#COBALT --mode script
+#COBALT -q default
+#COBALT --attrs filesystems=home,grand,theta-fs0
+
+set -eu
+
+PDOMAIN=XXX #CHANGEME
+
+PROJECT_HOME=`pwd`
+cd $PROJECT_HOME
+echo "Setting up spack and modules"
+source ./theta_sourceme.sh #CHANGEME
+
+
+echo "Setting up the protection domain"
+apstat -P | grep ${PDOMAIN} || apmgr pdomain -c -u ${PDOMAIN}
+sleep 5
+
+PROJECT_HOME=`pwd`
+##################################################################
+#C25 Experiments
+##################################################################
+cd $PROJECT_HOME
+cd C25/
+source ./sourceme.sh
+
+echo "Starting Ascent Server for C25"
+module unload darshan
+time aprun -n ${AMS_NUM_SERVERS} -N 60 -cc none -p ${PDOMAIN} example-server -a ofi+gni >& STDOUT &
+
+sleep 40
+
+for i in {1..6}
+do 
+	echo "Starting AMR-WIND for C25: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C25/$i
+	cd $PROJECT_HOME/C25/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=9
+	export AMS_SERVER_INSTANCE_ID=0
+	export AMS_ACTIONS_FILE=$HOME/serviz-experiments/configurations_C11_to_C30/ascent_action_files/default.yaml
+	time aprun -n 120 -N 60 -p ${PDOMAIN} -cc none -d 1 amr_wind ../../medium120.damBreak.i >& STDOUT &
+done
+for i in {7..9}
+do 
+	echo "Starting AMR-WIND for C25: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C25/$i
+	cd $PROJECT_HOME/C25/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=9
+	export AMS_ACTIONS_FILE=$HOME/serviz-experiments/configurations_C11_to_C30/ascent_action_files/volume.yaml
+	export AMS_SERVER_INSTANCE_ID=0
+	time aprun -n 120 -N 60 -p ${PDOMAIN} -cc none -d 1 amr_wind ../../medium120.damBreak.i >& STDOUT &
+done
+##################################################################
+#C26 Experiments
+##################################################################
+cd $PROJECT_HOME
+cd C26/
+source ./sourceme.sh
+
+echo "Starting Ascent Server for C26"
+module unload darshan
+time aprun -n ${AMS_NUM_SERVERS} -N 64 -cc none -p ${PDOMAIN} example-server -a ofi+gni >& STDOUT &
+
+sleep 30
+
+for i in {1..1}
+do 
+	echo "Starting AMR-WIND for C26: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C26/$i
+	cd $PROJECT_HOME/C26/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=2
+	export AMS_ACTIONS_FILE=$HOME/serviz-experiments/configurations_C11_to_C30/ascent_action_files/volume.yaml
+	export AMS_VIZ_FREQUENCY=2
+	export AMS_SERVER_INSTANCE_ID=0
+	export AMS_MAX_STEP=40
+	time aprun -n 128 -N 64 -p ${PDOMAIN} -cc none -d 1 amr_wind ../../medium120.damBreak.i >& STDOUT &
+done
+for i in {2..2}
+do 
+	echo "Starting Kripke for C26: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C26/$i
+	cd $PROJECT_HOME/C26/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=2
+	export AMS_VIZ_FREQUENCY=1
+	export AMS_SERVER_INSTANCE_ID=0
+	export AMS_MAX_STEP=100
+	time aprun -n 256 -N 64 -p ${PDOMAIN} -cc none -d 1 kripke_par --procs 8,8,4 --zones 256,256,128 --niter 100 --dir 1:2 --grp 1:1 --legendre 4 --quad 4:4 >& STDOUT &
+done
+##################################################################
+#C27 Experiments
+##################################################################
+cd $PROJECT_HOME
+cd C27/
+source ./sourceme.sh
+
+echo "Starting Ascent Server for C27"
+module unload darshan
+time aprun -n ${AMS_NUM_SERVERS} -N 64 -cc none -p ${PDOMAIN} example-server -a ofi+gni >& STDOUT &
+
+sleep 30
+
+for i in {1..2}
+do 
+	echo "Starting AMR-WIND for C27: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C27/$i
+	cd $PROJECT_HOME/C27/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=10
+	export AMS_ACTIONS_FILE=$HOME/serviz-experiments/configurations_C11_to_C30/ascent_action_files/volume.yaml
+	export AMS_VIZ_FREQUENCY=4
+	export AMS_SERVER_INSTANCE_ID=0
+	export AMS_MAX_STEP=40
+	time aprun -n 128 -N 64 -p ${PDOMAIN} -cc none -d 1 amr_wind ../../medium120.damBreak.i >& STDOUT &
+done
+for i in {3..10}
+do 
+	echo "Starting Kripke for C27: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C27/$i
+	cd $PROJECT_HOME/C27/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=10
+	export AMS_VIZ_FREQUENCY=8
+	export AMS_SERVER_INSTANCE_ID=0
+	export AMS_MAX_STEP=100
+	time aprun -n 256 -N 64 -p ${PDOMAIN} -cc none -d 1 kripke_par --procs 8,8,4 --zones 256,256,128 --niter 100 --dir 1:2 --grp 1:1 --legendre 4 --quad 4:4 >& STDOUT &
+done
+##################################################################
+#C28 Experiments
+##################################################################
+cd $PROJECT_HOME
+cd C28/
+source ./sourceme.sh
+
+echo "Starting Ascent Server for C28"
+module unload darshan
+time aprun -n ${AMS_NUM_SERVERS} -N 64 -cc none -p ${PDOMAIN} example-server -a ofi+gni >& STDOUT &
+
+sleep 30
+
+for i in {1..1}
+do 
+	echo "Starting AMR-WIND for C28: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C28/$i
+	cd $PROJECT_HOME/C28/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=2
+	export AMS_ACTIONS_FILE=$HOME/serviz-experiments/configurations_C11_to_C30/ascent_action_files/volume.yaml
+	export AMS_VIZ_FREQUENCY=2
+	export AMS_SERVER_INSTANCE_ID=0
+	export AMS_MAX_STEP=40
+	time aprun -n 128 -N 64 -p ${PDOMAIN} -cc none -d 1 amr_wind ../../medium120.damBreak.i >& STDOUT &
+done
+for i in {2..2}
+do 
+	echo "Starting Kripke for C28: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C28/$i
+	cd $PROJECT_HOME/C28/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=2
+	export AMS_VIZ_FREQUENCY=2
+	export AMS_SERVER_INSTANCE_ID=0
+	export AMS_MAX_STEP=100
+	time aprun -n 384 -N 64 -p ${PDOMAIN} -cc none -d 1 kripke_par --procs 8,8,6 --zones 256,256,128 --niter 100 --dir 1:2 --grp 1:1 --legendre 4 --quad 4:4 >& STDOUT &
+done
+##################################################################
+#C29 Experiments
+##################################################################
+cd $PROJECT_HOME
+cd C29/
+source ./sourceme.sh
+
+echo "Starting Ascent Server for C29"
+module unload darshan
+time aprun -n ${AMS_NUM_SERVERS} -N 64 -cc none -p ${PDOMAIN} example-server -a ofi+gni >& STDOUT &
+
+sleep 30
+
+for i in {1..2}
+do 
+	echo "Starting AMR-WIND for C29: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C29/$i
+	cd $PROJECT_HOME/C29/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=4
+	export AMS_ACTIONS_FILE=$HOME/serviz-experiments/configurations_C11_to_C30/ascent_action_files/volume.yaml
+	export AMS_VIZ_FREQUENCY=4
+	export AMS_SERVER_INSTANCE_ID=0
+	export AMS_MAX_STEP=40
+	time aprun -n 128 -N 64 -p ${PDOMAIN} -cc none -d 1 amr_wind ../../medium120.damBreak.i >& STDOUT &
+done
+for i in {3..4}
+do 
+	echo "Starting Kripke for C29: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C29/$i
+	cd $PROJECT_HOME/C29/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=4
+	export AMS_VIZ_FREQUENCY=4
+	export AMS_SERVER_INSTANCE_ID=0
+	export AMS_MAX_STEP=100
+	time aprun -n 384 -N 64 -p ${PDOMAIN} -cc none -d 1 kripke_par --procs 8,8,6 --zones 256,256,128 --niter 100 --dir 1:2 --grp 1:1 --legendre 4 --quad 4:4 >& STDOUT &
+done
+##################################################################
+#C30 Experiments
+##################################################################
+cd $PROJECT_HOME
+cd C30/
+source ./sourceme.sh
+
+echo "Starting Ascent Server for C30"
+module unload darshan
+time aprun -n ${AMS_NUM_SERVERS} -N 64 -cc none -p ${PDOMAIN} example-server -a ofi+gni >& STDOUT &
+
+sleep 30
+
+for i in {1..4}
+do 
+	echo "Starting AMR-WIND for C30: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C30/$i
+	cd $PROJECT_HOME/C30/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=8
+	export AMS_ACTIONS_FILE=$HOME/serviz-experiments/configurations_C11_to_C30/ascent_action_files/volume.yaml
+	export AMS_VIZ_FREQUENCY=8
+	export AMS_SERVER_INSTANCE_ID=0
+	export AMS_MAX_STEP=40
+	time aprun -n 128 -N 64 -p ${PDOMAIN} -cc none -d 1 amr_wind ../../medium120.damBreak.i >& STDOUT &
+done
+for i in {5..8}
+do 
+	echo "Starting Kripke for C30: $i"
+	module unload darshan
+	mkdir -p $PROJECT_HOME/C30/$i
+	cd $PROJECT_HOME/C30/$i
+	source ../sourceme.sh
+	export AMS_TASK_ID=$i
+	export AMS_MAX_TASK_ID=8
+	export AMS_VIZ_FREQUENCY=8
+	export AMS_SERVER_INSTANCE_ID=0
+	export AMS_MAX_STEP=100
+	time aprun -n 384 -N 64 -p ${PDOMAIN} -cc none -d 1 kripke_par --procs 8,8,6 --zones 256,256,128 --niter 100 --dir 1:2 --grp 1:1 --legendre 4 --quad 4:4 >& STDOUT &
+done
+##################################################################
+wait
